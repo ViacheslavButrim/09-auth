@@ -7,6 +7,7 @@ import NoteList from "@/components/NoteList/NoteList";
 import Pagination from "@/components/Pagination/Pagination";
 import css from "./NotesPage.module.css";
 
+
 export default function NotesPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
