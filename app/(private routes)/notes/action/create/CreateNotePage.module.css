@@ -1,0 +1,9 @@
+.container {
+    max-width: 600px;
+    margin: 60px auto;
+}
+
+.error {
+    margin-top: 12px;
+    color: red;
+}
