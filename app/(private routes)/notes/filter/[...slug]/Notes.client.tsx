@@ -1,77 +1,111 @@
 "use client";
 
-import { useState } from "react";
-import NoteList from "@/components/NoteList/NoteList";
-import Pagination from "@/components/Pagination/Pagination";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNotes } from "@/lib/api/clientApi";
+import { Note } from "@/types/note";
+import NoteList from "@/components/NoteList/NoteList";
+import Pagination from "@/components/Pagination/Pagination";
+import SearchBox from "@/components/SearchBox/SearchBox";
+import Link from "next/link";
 import css from "./Notes.module.css";
-
-interface Note {
-  id: string;
-  title: string;
-  content?: string;
-  tag?: string;
-}
 
 interface NotesResponse {
   notes: Note[];
   totalPages: number;
+  page: number;
 }
 
 interface Props {
   notes: Note[];
   currentPage: number;
   totalPages: number;
+  currentTag?: string;
 }
 
-export default function NotesClient({ notes: initialNotes, currentPage, totalPages }: Props) {
+export default function NotesClient({
+  notes: initialNotes,
+  currentPage,
+  totalPages,
+  currentTag = "",
+}: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [page, setPage] = useState(Number(searchParams.get("page")) || currentPage);
+  const [search, setSearch] = useState(
+    searchParams.get("search") ?? ""
+  );
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const [page, setPage] = useState(
+    Number(searchParams.get("page")) || currentPage
+  );
+  const [tag] = useState(currentTag ?? "");
 
-  const { data, isLoading, refetch } = useQuery<NotesResponse>({
-    queryKey: ["notes", page, search],
-    queryFn: () => fetchNotes({ page, search }),
-    initialData: { notes: initialNotes, totalPages },
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    params.set("page", page.toString());
+
+    if (debouncedSearch) {
+      params.set("search", debouncedSearch);
+    }
+
+    if (tag) {
+      params.set("tag", tag);
+    }
+
+    router.push(`?${params.toString()}`);
+  }, [debouncedSearch, page, tag, router]);
+
+  const { data, isPending } = useQuery<NotesResponse>({
+    queryKey: ["notes", page, debouncedSearch, tag],
+    queryFn: () =>
+      fetchNotes({
+        page,
+        search: debouncedSearch,
+        tag,
+      }),
+    initialData: {
+      notes: initialNotes,
+      totalPages,
+      page: currentPage,
+    },
   });
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setPage(1);
-    refetch();
-    const params = new URLSearchParams();
-    params.set("page", "1");
-    if (search) params.set("search", search);
-    router.push(`?${params.toString()}`);
-  };
+  const hasNotes = data.notes.length > 0;
 
   return (
     <div className={css.container}>
-      <form onSubmit={handleSearchSubmit} className={css.searchForm}>
-        <input
-          type="text"
-          placeholder="Search notes..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className={css.searchInput}
-        />
-        <button type="submit">Search</button>
-      </form>
+      <div className={css.topBar}>
+        <SearchBox onSearch={setSearch} />
 
-      {isLoading ? (
+        <Link href="/notes/action/create">
+          Create Note
+        </Link>
+      </div>
+
+      {isPending ? (
         <p>Loading...</p>
-      ) : (
+      ) : hasNotes ? (
         <>
-          <NoteList notes={data!.notes} />
+          <NoteList notes={data.notes} />
           <Pagination
             currentPage={page}
-            totalPages={data!.totalPages}
+            totalPages={data.totalPages}
           />
         </>
+      ) : (
+        <p>No notes found.</p>
       )}
     </div>
   );

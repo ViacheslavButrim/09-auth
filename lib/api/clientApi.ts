@@ -1,5 +1,6 @@
 import api from "./api";
 import { User } from "@/types/user";
+import { Note } from "@/types/note";
 
 export interface LoginRequest {
   email: string;
@@ -11,31 +12,18 @@ export interface RegisterRequest {
   password: string;
 }
 
-export interface Note {
-  id: string; 
-  title: string;
-  content: string;
-  tag: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface NotesResponse {
   notes: Note[];
   totalPages: number;
   page: number;
 }
 
-export const register = async (
-  body: RegisterRequest
-): Promise<User> => {
+export const register = async (body: RegisterRequest): Promise<User> => {
   const { data } = await api.post<User>("/auth/register", body);
   return data;
 };
 
-export const login = async (
-  body: LoginRequest
-): Promise<User> => {
+export const login = async (body: LoginRequest): Promise<User> => {
   const { data } = await api.post<User>("/auth/login", body);
   return data;
 };
@@ -49,9 +37,9 @@ export const getMe = async (): Promise<User> => {
   return data;
 };
 
-export const updateMe = async (
-  body: { username: string }
-): Promise<User> => {
+export const updateMe = async (body: {
+  username: string;
+}): Promise<User> => {
   const { data } = await api.patch<User>("/users/me", body);
   return data;
 };
@@ -71,9 +59,7 @@ export const fetchNotes = async (params: {
   return data;
 };
 
-export const fetchNoteById = async (
-  id: string
-): Promise<Note> => {
+export const fetchNoteById = async (id: string): Promise<Note> => {
   const { data } = await api.get<Note>(`/notes/${id}`);
   return data;
 };
@@ -87,16 +73,14 @@ export const createNote = async (body: {
   return data;
 };
 
-export const deleteNote = async (
-  id: string
-): Promise<Note> => {
+export const deleteNote = async (id: string): Promise<Note> => {
   const { data } = await api.delete<Note>(`/notes/${id}`);
   return data;
 };
 
 export const checkSession = async (): Promise<User | null> => {
   try {
-    const { data } = await api.get("/users/me");
+    const { data } = await api.get<User>("/users/me");
     return data;
   } catch {
     return null;

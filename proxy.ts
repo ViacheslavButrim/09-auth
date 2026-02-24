@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { cookies } from "next/headers";
+import { checkSession } from "@/lib/api/serverApi";
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isAuth = request.cookies.get("accessToken");
+
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken");
+  const refreshToken = cookieStore.get("refreshToken");
 
   const isPrivate =
     pathname.startsWith("/profile") || pathname.startsWith("/notes");
@@ -11,12 +16,25 @@ export function proxy(request: NextRequest) {
   const isAuthRoute =
     pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
 
-  if (!isAuth && isPrivate) {
+  let isAuthenticated = !!accessToken;
+
+  if (!accessToken && refreshToken) {
+    try {
+      const response = await checkSession();
+      if (response.status === 200) {
+        isAuthenticated = true;
+      }
+    } catch {
+      isAuthenticated = false;
+    }
+  }
+
+  if (!isAuthenticated && isPrivate) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
-  if (isAuth && isAuthRoute) {
-    return NextResponse.redirect(new URL("/profile", request.url));
+  if (isAuthenticated && isAuthRoute) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

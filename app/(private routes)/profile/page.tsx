@@ -2,8 +2,9 @@ import css from "./ProfilePage.module.css";
 import { getMe } from "@/lib/api/serverApi";
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Profile",
   description: "User profile page",
 };

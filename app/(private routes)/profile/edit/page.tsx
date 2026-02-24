@@ -1,32 +1,24 @@
 "use client";
 
 import css from "./EditProfilePage.module.css";
-import { getMe, updateMe } from "@/lib/api/clientApi";
-import { useEffect, useState } from "react";
+import { updateMe } from "@/lib/api/clientApi";
+import { useAuthStore } from "@/lib/store/authStore";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function EditProfilePage() {
   const router = useRouter();
+  const { user, setUser } = useAuthStore();
 
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [avatar, setAvatar] = useState("");
+  const [username, setUsername] = useState(user?.username ?? "");
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getMe();
-      setUsername(user.username);
-      setEmail(user.email);
-      setAvatar(user.avatar);
-    };
-
-    fetchUser();
-  }, []);
+  if (!user) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateMe({ username });
+    const updated = await updateMe({ username });
+    setUser(updated); // 🔥 оновлюємо глобальний store
     router.push("/profile");
   };
 
@@ -35,15 +27,13 @@ export default function EditProfilePage() {
       <div className={css.profileCard}>
         <h1 className={css.formTitle}>Edit Profile</h1>
 
-        {avatar && (
-          <Image
-            src={avatar}
-            alt="User Avatar"
-            width={120}
-            height={120}
-            className={css.avatar}
-          />
-        )}
+        <Image
+          src={user.avatar}
+          alt="User Avatar"
+          width={120}
+          height={120}
+          className={css.avatar}
+        />
 
         <form onSubmit={handleSubmit} className={css.profileInfo}>
           <div className={css.usernameWrapper}>
@@ -57,7 +47,7 @@ export default function EditProfilePage() {
             />
           </div>
 
-          <p>Email: {email}</p>
+          <p>Email: {user.email}</p>
 
           <div className={css.actions}>
             <button type="submit" className={css.saveButton}>

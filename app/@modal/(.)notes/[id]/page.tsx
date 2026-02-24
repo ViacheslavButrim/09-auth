@@ -1,20 +1,20 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { fetchNoteById } from "@/lib/api/serverApi";
 import NoteDetails from "@/app/(private routes)/notes/[id]/NoteDetails.client";
 
 interface Props {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
-export default function NoteModalPage({ params }: Props) {
-  const router = useRouter();
+export default async function NoteModalPage({ params }: Props) {
+  const { id } = await params;
 
-  const handleClose = () => {
-    router.back();
-  };
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["note", id],
+    queryFn: () => fetchNoteById(id),
+  });
 
   return (
     <div
@@ -27,7 +27,6 @@ export default function NoteModalPage({ params }: Props) {
         alignItems: "center",
         zIndex: 1000,
       }}
-      onClick={handleClose}
     >
       <div
         style={{
@@ -36,9 +35,10 @@ export default function NoteModalPage({ params }: Props) {
           borderRadius: "12px",
           minWidth: "400px",
         }}
-        onClick={(e) => e.stopPropagation()}
       >
-        <NoteDetails id={params.id} />
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <NoteDetails id={id} />
+        </HydrationBoundary>
       </div>
     </div>
   );

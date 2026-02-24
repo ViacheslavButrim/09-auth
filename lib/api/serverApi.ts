@@ -1,12 +1,12 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { cookies } from "next/headers";
 import { User } from "@/types/user";
-import { Note } from "./clientApi";
+import { Note } from "@/types/note";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL + "/api";
+const baseURL = `${process.env.NEXT_PUBLIC_API_URL}/api`;
 
-const getServerApi = () => {
-  const cookieStore = cookies();
+const getServerApi = async () => {
+  const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
 
   return axios.create({
@@ -17,8 +17,15 @@ const getServerApi = () => {
   });
 };
 
+export const checkSession = async (): Promise<
+  AxiosResponse<User>
+> => {
+  const api = await getServerApi();
+  return api.get<User>("/auth/session");
+};
+
 export const getMe = async (): Promise<User> => {
-  const api = getServerApi();
+  const api = await getServerApi();
   const { data } = await api.get<User>("/users/me");
   return data;
 };
@@ -28,8 +35,8 @@ export const fetchNotes = async (params: {
   page?: number;
   tag?: string;
 }): Promise<{ notes: Note[]; totalPages: number }> => {
-  const api = getServerApi();
-  const { data } = await api.get<{ notes: Note[]; totalPages: number }>("/notes", {
+  const api = await getServerApi();
+  const { data } = await api.get("/notes", {
     params: { ...params, perPage: 12 },
   });
 
@@ -37,7 +44,7 @@ export const fetchNotes = async (params: {
 };
 
 export const fetchNoteById = async (id: string): Promise<Note> => {
-  const api = getServerApi();
+  const api = await getServerApi();
   const { data } = await api.get<Note>(`/notes/${id}`);
   return data;
 };
