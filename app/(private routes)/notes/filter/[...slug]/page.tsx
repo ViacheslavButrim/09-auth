@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
 import { fetchNotes } from "@/lib/api/clientApi";
 import NoteList from "@/components/NoteList/NoteList";
-import Pagination from "@/components/Pagination/Pagination";
+import PaginationWithRouter from "@/components/Pagination/PaginationWithRouter";
 
 export default function FilterNotesPage() {
   const searchParams = useSearchParams();
@@ -25,7 +25,7 @@ export default function FilterNotesPage() {
   return (
     <>
       <NoteList notes={notes} />
-      <Pagination currentPage={page} totalPages={data?.totalPages ?? 1} />
+      <PaginationWithRouter currentPage={page} totalPages={data?.totalPages ?? 1} />
     </>
   );
 }

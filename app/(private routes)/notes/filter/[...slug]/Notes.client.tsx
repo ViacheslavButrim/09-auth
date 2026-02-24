@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNotes } from "@/lib/api/clientApi";
@@ -24,7 +24,7 @@ export default function NotesClient() {
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-  const [tag] = useState(searchParams.get("tag") ?? ""); // setTag прибрано
+  const [tag] = useState(searchParams.get("tag") ?? "");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -52,6 +52,10 @@ export default function NotesClient() {
       }),
   });
 
+  const handlePageChange = useCallback((newPage: number) => {
+    setPage(newPage);
+  }, []);
+
   const hasNotes = (data?.notes ?? []).length > 0;
 
   return (
@@ -61,16 +65,20 @@ export default function NotesClient() {
         <Link href="/notes/action/create">Create Note</Link>
       </div>
 
-   {isPending ? (
-  <p>Loading...</p>
-) : hasNotes ? (
-  <>
-    <NoteList notes={data?.notes ?? []} />
-    <Pagination currentPage={page} totalPages={data?.totalPages ?? 1} />
-  </>
-) : (
-  <p>No notes found.</p>
-)}
+      {isPending ? (
+        <p>Loading...</p>
+      ) : hasNotes ? (
+        <>
+          <NoteList notes={data?.notes ?? []} />
+          <Pagination
+            currentPage={page}
+            totalPages={data?.totalPages ?? 1}
+            onPageChange={handlePageChange}
+          />
+        </>
+      ) : (
+        <p>No notes found.</p>
+      )}
     </div>
   );
 }
