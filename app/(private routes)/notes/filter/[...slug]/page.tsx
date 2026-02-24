@@ -1,31 +1,26 @@
-"use client";
-
-import { useQuery } from "@tanstack/react-query";
-import { usePathname, useSearchParams } from "next/navigation";
-import { fetchNotes } from "@/lib/api/clientApi";
+import { fetchNotes } from "@/lib/api/serverApi";
 import NoteList from "@/components/NoteList/NoteList";
 import PaginationWithRouter from "@/components/Pagination/PaginationWithRouter";
 
-export default function FilterNotesPage() {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
+interface FilterNotesPageProps {
+  params: { slug?: string[] };
+  searchParams: { page?: string };
+}
 
-  const slug = pathname.split("/").slice(-1)[0];
-  const page = Number(searchParams.get("page") ?? 1);
+export default async function FilterNotesPage({
+  params,
+  searchParams,
+}: FilterNotesPageProps) {
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["notes", slug, page],
-    queryFn: () => fetchNotes({ page, tag: slug }),
-  });
+  const page = Number(searchParams.page ?? 1);
 
-  const notes = data?.notes ?? [];
-
-  if (isLoading) return <p>Loading notes...</p>;
+  const data = await fetchNotes({ page, tag: slug });
 
   return (
     <>
-      <NoteList notes={notes} />
-      <PaginationWithRouter currentPage={page} totalPages={data?.totalPages ?? 1} />
+      <NoteList notes={data.notes} />
+      <PaginationWithRouter currentPage={page} totalPages={data.totalPages} />
     </>
   );
 }

@@ -24,13 +24,20 @@ export default function NotesClient() {
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-  const [tag] = useState(searchParams.get("tag") ?? "");
+
+  const tag = searchParams.get("tag") ?? "";
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1);
+      setDebouncedSearch((prev) => {
+        if (prev !== search) {
+          setPage(1); 
+          return search;
+        }
+        return prev;
+      });
     }, 400);
+
     return () => clearTimeout(timer);
   }, [search]);
 
@@ -39,8 +46,23 @@ export default function NotesClient() {
     params.set("page", page.toString());
     if (debouncedSearch) params.set("search", debouncedSearch);
     if (tag) params.set("tag", tag);
-    router.push(`?${params.toString()}`);
-  }, [debouncedSearch, page, tag, router]);
+
+    const newQuery = params.toString();
+    const currentQuery = searchParams.toString();
+
+    if (newQuery !== currentQuery) {
+      router.push(`?${newQuery}`);
+    }
+  }, [debouncedSearch, page, tag, router, searchParams]);
+
+  const handleSearch = useCallback((value: string) => {
+    setSearch((prev) => (prev === value ? prev : value));
+  }, []);
+
+  const handlePageChange = useCallback((newPage: number) => {
+    setPage(newPage);
+  }, []);
+
 
   const { data, isPending } = useQuery<NotesResponse>({
     queryKey: ["notes", page, debouncedSearch, tag],
@@ -52,16 +74,13 @@ export default function NotesClient() {
       }),
   });
 
-  const handlePageChange = useCallback((newPage: number) => {
-    setPage(newPage);
-  }, []);
-
-  const hasNotes = (data?.notes ?? []).length > 0;
+  const notes = data?.notes ?? [];
+  const hasNotes = notes.length > 0;
 
   return (
     <div className={css.container}>
       <div className={css.topBar}>
-        <SearchBox onSearch={setSearch} />
+        <SearchBox onSearch={handleSearch} />
         <Link href="/notes/action/create">Create Note</Link>
       </div>
 
@@ -69,7 +88,7 @@ export default function NotesClient() {
         <p>Loading...</p>
       ) : hasNotes ? (
         <>
-          <NoteList notes={data?.notes ?? []} />
+          <NoteList notes={notes} />
           <Pagination
             currentPage={page}
             totalPages={data?.totalPages ?? 1}
