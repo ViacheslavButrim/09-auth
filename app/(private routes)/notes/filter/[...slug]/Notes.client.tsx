@@ -17,53 +17,28 @@ interface NotesResponse {
   page: number;
 }
 
-interface Props {
-  notes: Note[];
-  currentPage: number;
-  totalPages: number;
-  currentTag?: string;
-}
-
-export default function NotesClient({
-  notes: initialNotes,
-  currentPage,
-  totalPages,
-  currentTag = "",
-}: Props) {
+export default function NotesClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [search, setSearch] = useState(
-    searchParams.get("search") ?? ""
-  );
+  const [search, setSearch] = useState(searchParams.get("search") ?? "");
   const [debouncedSearch, setDebouncedSearch] = useState(search);
-  const [page, setPage] = useState(
-    Number(searchParams.get("page")) || currentPage
-  );
-  const [tag] = useState(currentTag ?? "");
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+  const [tag] = useState(searchParams.get("tag") ?? ""); // setTag прибрано
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
       setPage(1);
     }, 400);
-
     return () => clearTimeout(timer);
   }, [search]);
 
   useEffect(() => {
     const params = new URLSearchParams();
-
     params.set("page", page.toString());
-
-    if (debouncedSearch) {
-      params.set("search", debouncedSearch);
-    }
-
-    if (tag) {
-      params.set("tag", tag);
-    }
-
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    if (tag) params.set("tag", tag);
     router.push(`?${params.toString()}`);
   }, [debouncedSearch, page, tag, router]);
 
@@ -75,38 +50,27 @@ export default function NotesClient({
         search: debouncedSearch,
         tag,
       }),
-    initialData: {
-      notes: initialNotes,
-      totalPages,
-      page: currentPage,
-    },
   });
 
-  const hasNotes = data.notes.length > 0;
+  const hasNotes = (data?.notes ?? []).length > 0;
 
   return (
     <div className={css.container}>
       <div className={css.topBar}>
         <SearchBox onSearch={setSearch} />
-
-        <Link href="/notes/action/create">
-          Create Note
-        </Link>
+        <Link href="/notes/action/create">Create Note</Link>
       </div>
 
-      {isPending ? (
-        <p>Loading...</p>
-      ) : hasNotes ? (
-        <>
-          <NoteList notes={data.notes} />
-          <Pagination
-            currentPage={page}
-            totalPages={data.totalPages}
-          />
-        </>
-      ) : (
-        <p>No notes found.</p>
-      )}
+   {isPending ? (
+  <p>Loading...</p>
+) : hasNotes ? (
+  <>
+    <NoteList notes={data?.notes ?? []} />
+    <Pagination currentPage={page} totalPages={data?.totalPages ?? 1} />
+  </>
+) : (
+  <p>No notes found.</p>
+)}
     </div>
   );
 }

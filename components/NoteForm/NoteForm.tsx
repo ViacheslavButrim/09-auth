@@ -50,9 +50,11 @@ export default function NoteForm() {
         required
       >
         <option value="">Select tag</option>
+        <option value="todo">Todo</option>
         <option value="work">Work</option>
         <option value="personal">Personal</option>
-        <option value="study">Study</option>
+        <option value="meeting">Meeting</option>
+        <option value="shopping">Shopping</option>
       </select>
 
       <div>
