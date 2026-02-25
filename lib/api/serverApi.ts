@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { User } from "@/types/user";
 import { Note } from "@/types/note";
 
-const baseURL = `${process.env.NEXT_PUBLIC_API_URL}/api`;
+const baseURL = process.env.NEXT_PUBLIC_API_URL!;
 
 const getServerApi = async () => {
   const cookieStore = await cookies();
