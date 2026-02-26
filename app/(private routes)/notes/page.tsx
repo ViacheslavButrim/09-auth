@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNotes } from "@/lib/api/clientApi";
@@ -18,19 +19,29 @@ export default function NotesPage() {
     queryFn: () => fetchNotes({ page }),
   });
 
+  useEffect(() => {
+    if (isError) {
+      router.push("/sign-in");
+    }
+  }, [isError, router]);
+
   if (isLoading) return <p>Loading...</p>;
 
-  if (isError || !data) {
-    router.push("/sign-in");
-    return null;
-  }
-
+  if (!data) return null;
   return (
     <div className={css.container}>
-      <h1>Notes</h1>
+      <div className={css.toolbar}>
+        <h1>Notes</h1>
+        <button
+          className={css.button}
+          onClick={() => router.push("/notes/new")}
+        >
+          New Note
+        </button>
+      </div>
+
       <NoteList notes={data.notes} />
-      <PaginationWithRouter currentPage={page}
-        totalPages={data.totalPages} />
+      <PaginationWithRouter currentPage={page} totalPages={data.totalPages} />
     </div>
   );
 }

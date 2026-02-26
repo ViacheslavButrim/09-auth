@@ -24,15 +24,21 @@ export default function Pagination({
 
   return (
     <div className={css.pagination}>
-      {Array.from({ length: totalPages }, (_, i) => (
-        <button
-          key={i}
-          onClick={() => changePage(i + 1)}
-          disabled={currentPage === i + 1}
-        >
-          {i + 1}
-        </button>
-      ))}
+      {Array.from({ length: totalPages }, (_, i) => {
+        const page = i + 1;
+
+        return (
+          <button
+            key={page}
+            onClick={() => changePage(page)}
+            disabled={currentPage === page}
+            className={`${css.pageButton} ${currentPage === page ? css.active : ""
+              }`}
+          >
+            {page}
+          </button>
+        );
+      })}
     </div>
   );
 }
