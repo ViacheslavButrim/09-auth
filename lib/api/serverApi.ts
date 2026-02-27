@@ -1,32 +1,33 @@
-import axios, { AxiosResponse } from "axios";
+import api from "./api";
 import { cookies } from "next/headers";
+import { AxiosResponse } from "axios";
 import { User } from "@/types/user";
 import { Note } from "@/types/note";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL!;
-
-const getServerApi = async () => {
+const getCookieHeader = async (): Promise<string> => {
   const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
+  return cookieStore.toString();
+};
 
-  return axios.create({
-    baseURL,
+export const checkServerSession = async (): Promise<AxiosResponse<User>> => {
+  const cookieHeader = await getCookieHeader();
+
+  return api.get<User>("/auth/session", {
     headers: {
       Cookie: cookieHeader,
     },
   });
 };
 
-export const checkSession = async (): Promise<
-  AxiosResponse<User>
-> => {
-  const api = await getServerApi();
-  return api.get<User>("/auth/session");
-};
-
 export const getMe = async (): Promise<User> => {
-  const api = await getServerApi();
-  const { data } = await api.get<User>("/users/me");
+  const cookieHeader = await getCookieHeader();
+
+  const { data } = await api.get<User>("/users/me", {
+    headers: {
+      Cookie: cookieHeader,
+    },
+  });
+
   return data;
 };
 
@@ -35,8 +36,12 @@ export const fetchNotes = async (params: {
   page?: number;
   tag?: string;
 }): Promise<{ notes: Note[]; totalPages: number }> => {
-  const api = await getServerApi();
+  const cookieHeader = await getCookieHeader();
+
   const { data } = await api.get("/notes", {
+    headers: {
+      Cookie: cookieHeader,
+    },
     params: { ...params, perPage: 12 },
   });
 
@@ -44,7 +49,13 @@ export const fetchNotes = async (params: {
 };
 
 export const fetchNoteById = async (id: string): Promise<Note> => {
-  const api = await getServerApi();
-  const { data } = await api.get<Note>(`/notes/${id}`);
+  const cookieHeader = await getCookieHeader();
+
+  const { data } = await api.get<Note>(`/notes/${id}`, {
+    headers: {
+      Cookie: cookieHeader,
+    },
+  });
+
   return data;
 };

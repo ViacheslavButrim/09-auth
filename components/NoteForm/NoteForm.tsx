@@ -12,14 +12,17 @@ export default function NoteForm() {
 
   const { title, content, tag, setField, reset } = useNoteDraftStore();
 
-  const mutation = useMutation({
-    mutationFn: createNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-      reset();
-      router.back();
-    },
-  });
+ const mutation = useMutation({
+   mutationFn: createNote,
+   onSuccess: async () => {
+     await queryClient.invalidateQueries({ queryKey: ["notes"] });
+     reset();
+     router.push("/notes");
+   },
+   onError: (error) => {
+     console.error("Create note failed:", error);
+   },
+ });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
