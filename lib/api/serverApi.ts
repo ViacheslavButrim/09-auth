@@ -19,16 +19,17 @@ export const checkServerSession = async (): Promise<AxiosResponse<User>> => {
   });
 };
 
-export const getMe = async (): Promise<User> => {
-  const cookieHeader = await getCookieHeader();
-
-  const { data } = await api.get<User>("/users/me", {
-    headers: {
-      Cookie: cookieHeader,
-    },
-  });
-
-  return data;
+export const getMe = async () => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/me`,
+      { credentials: "include" } 
+    );
+    const data = await res.json();
+    return data ?? null;
+  } catch {
+    return null;
+  }
 };
 
 export const fetchNotes = async (params: {

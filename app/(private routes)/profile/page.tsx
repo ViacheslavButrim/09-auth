@@ -2,15 +2,24 @@ import css from "./ProfilePage.module.css";
 import { getMe } from "@/lib/api/serverApi";
 import Image from "next/image";
 import Link from "next/link";
-import type { Metadata } from "next";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Profile",
   description: "User profile page",
 };
 
 export default async function ProfilePage() {
   const user = await getMe();
+
+  // Якщо user відсутній
+  if (!user) {
+    return (
+      <main className={css.mainContent}>
+        <p>User not found. Please log in.</p>
+        <Link href="/sign-in">Sign In</Link>
+      </main>
+    );
+  }
 
   return (
     <main className={css.mainContent}>
@@ -24,7 +33,7 @@ export default async function ProfilePage() {
 
         <div className={css.avatarWrapper}>
           <Image
-            src={user.avatar}
+            src={user.avatar ?? "/default-avatar.png"} // fallback avatar
             alt="User Avatar"
             width={120}
             height={120}
@@ -33,8 +42,8 @@ export default async function ProfilePage() {
         </div>
 
         <div className={css.profileInfo}>
-          <p>Username: {user.username}</p>
-          <p>Email: {user.email}</p>
+          <p>Username: {user.username ?? "Unknown"}</p>
+          <p>Email: {user.email ?? "Unknown"}</p>
         </div>
       </div>
     </main>
