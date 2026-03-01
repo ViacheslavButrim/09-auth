@@ -28,7 +28,7 @@ export default function EditProfilePage() {
         <h1 className={css.formTitle}>Edit Profile</h1>
 
         <Image
-          src={user.avatar}
+          src={user.avatar ?? "/default-avatar.png"} // fallback avatar
           alt="User Avatar"
           width={120}
           height={120}
@@ -47,7 +47,7 @@ export default function EditProfilePage() {
             />
           </div>
 
-          <p>Email: {user.email}</p>
+          <p>Email: {user.email ?? "Unknown"}</p>
 
           <div className={css.actions}>
             <button type="submit" className={css.saveButton}>
