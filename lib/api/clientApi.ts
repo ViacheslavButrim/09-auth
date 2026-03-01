@@ -19,17 +19,17 @@ export interface NotesResponse {
 }
 
 export const register = async (body: RegisterRequest): Promise<User> => {
-  const { data } = await api.post<User>("/users/register", body);
+  const { data } = await api.post<User>("/auth/register", body);
   return data;
 };
 
 export const login = async (body: LoginRequest): Promise<User> => {
-  const { data } = await api.post<User>("/users/login", body);
+  const { data } = await api.post<User>("/auth/login", body);
   return data;
 };
 
 export const logout = async (): Promise<void> => {
-  await api.post("/users/logout");
+  await api.post("/auth/logout");
 };
 
 export const getMe = async (): Promise<User> => {
