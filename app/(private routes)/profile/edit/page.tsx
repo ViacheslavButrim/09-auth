@@ -17,9 +17,14 @@ export default function EditProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updated = await updateMe({ username });
-    setUser(updated); 
-    router.push("/profile");
+    try {
+      const updated = await updateMe({ username });
+      setUser(updated);
+      router.push("/profile");
+    } catch (err) {
+      console.error("Failed to update profile:", err);
+      alert("Error updating profile");
+    }
   };
 
   return (
@@ -28,7 +33,7 @@ export default function EditProfilePage() {
         <h1 className={css.formTitle}>Edit Profile</h1>
 
         <Image
-          src={user.avatar ?? "/default-avatar.png"} // fallback avatar
+          src={user.avatar ?? "/default-avatar.png"}
           alt="User Avatar"
           width={120}
           height={120}

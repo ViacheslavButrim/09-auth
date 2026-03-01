@@ -9,9 +9,15 @@ export const metadata = {
 };
 
 export default async function ProfilePage() {
-  const user = await getMe();
+  let user = null;
 
-  // Якщо user відсутній
+  try {
+    user = await getMe();
+  } catch (err) {
+    console.error("Failed to fetch user:", err);
+    user = null; // fallback
+  }
+
   if (!user) {
     return (
       <main className={css.mainContent}>
@@ -33,7 +39,7 @@ export default async function ProfilePage() {
 
         <div className={css.avatarWrapper}>
           <Image
-            src={user.avatar ?? "/default-avatar.png"} // fallback avatar
+            src={user.avatar ?? "/default-avatar.png"}
             alt="User Avatar"
             width={120}
             height={120}
