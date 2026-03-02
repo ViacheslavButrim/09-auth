@@ -22,7 +22,7 @@ export const checkServerSession = async (): Promise<AxiosResponse<User>> => {
 export const getMe = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/users/me`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
       { credentials: "include" } 
     );
     const data = await res.json();
