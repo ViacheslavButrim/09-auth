@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL + '/api';
+const BASE_URL = '/api';
 
-export const api = axios.create({
+export const nextServer = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
 });
 
-export default api;
+export default nextServer;
