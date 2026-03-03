@@ -2,6 +2,19 @@ import api from "./api";
 import { User } from "@/types/user";
 import { Note } from "@/types/note";
 
+export const uploadImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const { data } = await api.post("/upload", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return data.url; 
+};
+
 export const updateAvatar = async (file: File): Promise<User> => {
   const formData = new FormData();
   formData.append("avatar", file);
@@ -25,12 +38,6 @@ export interface RegisterRequest {
   password: string;
 }
 
-export interface NotesResponse {
-  notes: Note[];
-  totalPages: number;
-  page: number;
-}
-
 export const register = async (body: RegisterRequest): Promise<User> => {
   const { data } = await api.post<User>("/auth/register", body);
   return data;
@@ -52,10 +59,17 @@ export const getMe = async (): Promise<User> => {
 
 export const updateMe = async (body: {
   username: string;
+  photoUrl?: string;
 }): Promise<User> => {
   const { data } = await api.patch<User>("/users/me", body);
   return data;
 };
+
+export interface NotesResponse {
+  notes: Note[];
+  totalPages: number;
+  page: number;
+}
 
 export const fetchNotes = async (params: {
   search?: string;

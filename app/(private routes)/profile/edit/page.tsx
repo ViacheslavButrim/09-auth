@@ -13,24 +13,27 @@ export default function EditProfilePage() {
   const { user, setUser } = useAuthStore();
 
   const [username, setUsername] = useState(user?.username ?? "");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   if (!user) return null;
 
-  const handleAvatarSelect = async (file: File) => {
-    try {
-      const updatedUser = await updateAvatar(file);
-      setUser(updatedUser); 
-    } catch (err) {
-      console.error("Failed to update avatar:", err);
-      alert("Error updating avatar");
-    }
+  const handleAvatarSelect = (file: File | null) => {
+    setAvatarFile(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      const updated = await updateMe({ username }); 
-      setUser(updated);
+      let updatedUser = user;
+
+      if (avatarFile) {
+        updatedUser = await updateAvatar(avatarFile);
+      }
+
+      const profileUpdated = await updateMe({ username });
+      setUser({ ...updatedUser, ...profileUpdated });
+
       router.push("/profile");
     } catch (err) {
       console.error("Failed to update profile:", err);
@@ -51,7 +54,10 @@ export default function EditProfilePage() {
           className={css.avatar}
         />
 
-        <AvatarPicker onFileSelect={handleAvatarSelect} />
+        <AvatarPicker
+          profilePhotoUrl={user.avatar ?? ""}
+          onFileSelect={handleAvatarSelect}
+        />
 
         <form onSubmit={handleSubmit} className={css.profileInfo}>
           <div className={css.usernameWrapper}>
