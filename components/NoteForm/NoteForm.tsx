@@ -27,14 +27,13 @@ export default function NoteForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ✅ Перевірка порожніх полів
     if (!title.trim() || !content.trim() || !tag.trim()) {
       console.error("All fields are required");
       return;
     }
 
-    // ✅ Перевірка валідного тегу
-    const validTags = ["todo", "work", "personal", "meeting", "shopping"];
+
+    const validTags = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
     if (!validTags.includes(tag)) {
       console.error("Invalid tag value for production API.");
       return;
@@ -72,11 +71,11 @@ export default function NoteForm() {
         required
       >
         <option value="">Select tag</option>
-        <option value="todo">Todo</option>
-        <option value="work">Work</option>
-        <option value="personal">Personal</option>
-        <option value="meeting">Meeting</option>
-        <option value="shopping">Shopping</option>
+        <option value="Todo">Todo</option>
+        <option value="Work">Work</option>
+        <option value="Personal">Personal</option>
+        <option value="Meeting">Meeting</option>
+        <option value="Shopping">Shopping</option>
       </select>
 
       <div>
