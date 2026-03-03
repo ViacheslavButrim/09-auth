@@ -15,7 +15,7 @@ export default async function ProfilePage() {
     user = await getMe();
   } catch (err) {
     console.error("Failed to fetch user:", err);
-    user = null; // fallback
+    user = null; 
   }
 
   if (!user) {

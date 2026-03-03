@@ -91,12 +91,10 @@ export const fetchNoteById = async (id: string): Promise<Note> => {
   return data;
 };
 
-export const createNote = async (body: {
-  title: string;
-  content: string;
-  tag: string;
-}): Promise<Note> => {
-  const { data } = await api.post<Note>("/notes", body);
+export const createNote = async (body: { title: string; content: string; tag: string }) => {
+  const { data } = await api.post("/notes", body, {
+    headers: { "Content-Type": "application/json" },
+  });
   return data;
 };
 
