@@ -26,6 +26,25 @@ export default function NoteForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // ✅ Перевірка порожніх полів
+    if (!title.trim() || !content.trim() || !tag.trim()) {
+      console.error("All fields are required");
+      return;
+    }
+
+    // ✅ Перевірка валідного тегу
+    const validTags = ["todo", "work", "personal", "meeting", "shopping"];
+    if (!validTags.includes(tag)) {
+      console.error("Invalid tag value for production API.");
+      return;
+    }
+
+    if (title.trim().length < 3 || content.trim().length < 5) {
+      console.error("Title or content too short");
+      return;
+    }
+
     mutation.mutate({ title, content, tag });
   };
 
