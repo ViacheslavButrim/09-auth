@@ -1,7 +1,7 @@
 "use client";
 
 import css from "./EditProfilePage.module.css";
-import { updateMe } from "@/lib/api/clientApi";
+import { updateMe, updateAvatar } from "@/lib/api/clientApi";
 import { useAuthStore } from "@/lib/store/authStore";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -16,10 +16,20 @@ export default function EditProfilePage() {
 
   if (!user) return null;
 
+  const handleAvatarSelect = async (file: File) => {
+    try {
+      const updatedUser = await updateAvatar(file);
+      setUser(updatedUser); 
+    } catch (err) {
+      console.error("Failed to update avatar:", err);
+      alert("Error updating avatar");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const updated = await updateMe({ username });
+      const updated = await updateMe({ username }); 
       setUser(updated);
       router.push("/profile");
     } catch (err) {
@@ -41,7 +51,7 @@ export default function EditProfilePage() {
           className={css.avatar}
         />
 
-        <AvatarPicker />
+        <AvatarPicker onFileSelect={handleAvatarSelect} />
 
         <form onSubmit={handleSubmit} className={css.profileInfo}>
           <div className={css.usernameWrapper}>

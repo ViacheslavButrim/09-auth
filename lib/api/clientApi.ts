@@ -2,6 +2,19 @@ import api from "./api";
 import { User } from "@/types/user";
 import { Note } from "@/types/note";
 
+export const updateAvatar = async (file: File): Promise<User> => {
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+  const { data } = await api.patch<User>("/users/me/avatar", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return data;
+};
+
 export interface LoginRequest {
   email: string;
   password: string;
