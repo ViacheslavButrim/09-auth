@@ -111,3 +111,8 @@ export const checkSession = async (): Promise<User | null> => {
     return null;
   }
 };
+
+export const fetchTags = async (): Promise<string[]> => {
+  const { data } = await api.get<string[]>("/tags"); 
+  return data;
+};
