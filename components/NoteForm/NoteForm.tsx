@@ -54,7 +54,7 @@ export default function NoteForm() {
       return;
     }
 
-    mutation.mutate({ title, content, tag: "Todo", });
+    mutation.mutate({ title, content, tag });
   };
 
   return (
