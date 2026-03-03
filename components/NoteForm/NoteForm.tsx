@@ -6,6 +6,19 @@ import { createNote } from "@/lib/api/clientApi";
 import { useNoteDraftStore } from "@/lib/store/noteDraftStore";
 import { useRouter } from "next/navigation";
 
+const validTags: string[] = [
+  "Work",
+  "Personal",
+  "Meeting",
+  "Shopping",
+  "Ideas",
+  "Travel",
+  "Finance",
+  "Health",
+  "Important",
+  "Todo",
+];
+    
 export default function NoteForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -32,18 +45,7 @@ export default function NoteForm() {
       return;
     }
 
-    const validTags = [
-      "Work",
-      "Personal",
-      "Meeting",
-      "Shopping",
-      "Ideas",
-      "Travel",
-      "Finance",
-      "Health",
-      "Important",
-      "Todo",
-    ];
+    
     if (!validTags.includes(tag)) {
       console.error("Invalid tag value for production API.");
       return;
@@ -91,6 +93,11 @@ export default function NoteForm() {
         <option value="Health">Health</option>
         <option value="Important">Important</option>
         <option value="Todo">Todo</option>
+        {validTags.map((t: string) => (
+          <option key={t} value={t}>
+            {t}
+          </option>
+        ))}
       </select>
 
       <div>
