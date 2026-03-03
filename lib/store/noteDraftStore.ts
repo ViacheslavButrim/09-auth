@@ -8,6 +8,19 @@ interface NoteDraftStore {
   reset: () => void;
 }
 
+const validTags = [
+  "Work",
+  "Personal",
+  "Meeting",
+  "Shopping",
+  "Ideas",
+  "Travel",
+  "Finance",
+  "Health",
+  "Important",
+  "Todo",
+];
+
 export const useNoteDraftStore = create<NoteDraftStore>((set) => ({
   title: "",
   content: "",
@@ -15,7 +28,10 @@ export const useNoteDraftStore = create<NoteDraftStore>((set) => ({
   setField: (field, value) =>
     set((state) => ({
       ...state,
-      [field]: value,
+      [field]:
+        field === "tag"
+          ? validTags.find((t) => t.toLowerCase() === value.toLowerCase()) || ""
+          : value,
     })),
   reset: () =>
     set({
