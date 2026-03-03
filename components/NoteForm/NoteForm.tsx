@@ -12,17 +12,17 @@ export default function NoteForm() {
 
   const { title, content, tag, setField, reset } = useNoteDraftStore();
 
- const mutation = useMutation({
-   mutationFn: createNote,
-   onSuccess: async () => {
-     await queryClient.invalidateQueries({ queryKey: ["notes"] });
-     reset();
-     router.push("/notes");
-   },
-   onError: (error) => {
-     console.error("Create note failed:", error);
-   },
- });
+  const mutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["notes"] });
+      reset();
+      router.push("/notes");
+    },
+    onError: (error) => {
+      console.error("Create note failed:", error);
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,8 +32,18 @@ export default function NoteForm() {
       return;
     }
 
-
-    const validTags = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
+    const validTags = [
+      "Work",
+      "Personal",
+      "Meeting",
+      "Shopping",
+      "Ideas",
+      "Travel",
+      "Finance",
+      "Health",
+      "Important",
+      "Todo",
+    ];
     if (!validTags.includes(tag)) {
       console.error("Invalid tag value for production API.");
       return;
@@ -44,7 +54,7 @@ export default function NoteForm() {
       return;
     }
 
-    mutation.mutate({ title, content, tag });
+    mutation.mutate({ title, content, tag: "Todo" });
   };
 
   return (
@@ -71,11 +81,16 @@ export default function NoteForm() {
         required
       >
         <option value="">Select tag</option>
-        <option value="Todo">Todo</option>
         <option value="Work">Work</option>
         <option value="Personal">Personal</option>
         <option value="Meeting">Meeting</option>
         <option value="Shopping">Shopping</option>
+        <option value="Ideas">Ideas</option>
+        <option value="Travel">Travel</option>
+        <option value="Finance">Finance</option>
+        <option value="Health">Health</option>
+        <option value="Important">Important</option>
+        <option value="Todo">Todo</option>
       </select>
 
       <div>
