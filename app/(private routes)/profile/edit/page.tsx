@@ -6,6 +6,7 @@ import { useAuthStore } from "@/lib/store/authStore";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import AvatarPicker from "@/components/AvatarPicker/AvatarPicker";
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -39,6 +40,8 @@ export default function EditProfilePage() {
           height={120}
           className={css.avatar}
         />
+
+        <AvatarPicker />
 
         <form onSubmit={handleSubmit} className={css.profileInfo}>
           <div className={css.usernameWrapper}>
