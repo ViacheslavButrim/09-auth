@@ -1,20 +1,30 @@
 "use client";
 
 import css from "./NoteForm.module.css";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createNote, fetchTags } from "@/lib/api/clientApi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createNote } from "@/lib/api/clientApi";
 import { useNoteDraftStore } from "@/lib/store/noteDraftStore";
 import { useRouter } from "next/navigation";
+
+export const NOTE_TAGS = [
+  "Work",
+  "Personal",
+  "Meeting",
+  "Shopping",
+  "Ideas",
+  "Travel",
+  "Finance",
+  "Health",
+  "Important",
+  "Todo",
+] as const;
+
+export type NoteTag = (typeof NOTE_TAGS)[number];
 
 export default function NoteForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { title, content, tag, setField, reset } = useNoteDraftStore();
-
-  const { data: validTags = [], isLoading: tagsLoading } = useQuery({
-    queryKey: ["tags"],
-    queryFn: fetchTags,
-  });
 
   const mutation = useMutation({
     mutationFn: createNote,
@@ -36,7 +46,7 @@ export default function NoteForm() {
       return;
     }
 
-    if (!validTags.includes(tag)) {
+    if (!NOTE_TAGS.includes(tag as NoteTag)) {
       console.error("Invalid tag value for production API.");
       return;
     }
@@ -71,10 +81,9 @@ export default function NoteForm() {
         value={tag}
         onChange={(e) => setField("tag", e.target.value)}
         required
-        disabled={tagsLoading} 
       >
         <option value="">Select tag</option>
-        {validTags.map((t: string) => (
+        {NOTE_TAGS.map((t) => (
           <option key={t} value={t}>
             {t}
           </option>
@@ -82,7 +91,7 @@ export default function NoteForm() {
       </select>
 
       <div>
-        <button type="submit" disabled={mutation.isPending || tagsLoading}>
+        <button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? "Saving..." : "Save"}
         </button>
         <button type="button" onClick={() => router.back()}>
