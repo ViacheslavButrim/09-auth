@@ -24,10 +24,13 @@ export type NoteTag = (typeof NOTE_TAGS)[number];
 export default function NoteForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { title, content, tag, setField, reset } = useNoteDraftStore();
+
+  const { title, content, tag, setTitle, setContent, setTag, reset } =
+    useNoteDraftStore();
 
   const mutation = useMutation({
     mutationFn: createNote,
+    retry: false,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["notes"] });
       reset();
@@ -41,22 +44,30 @@ export default function NoteForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || !content.trim() || !tag.trim()) {
+    const normalizedTitle = title.trim();
+    const normalizedContent = content.trim();
+    const normalizedTag = tag.trim() as NoteTag;
+
+    if (!normalizedTitle || !normalizedContent || !normalizedTag) {
       console.error("All fields are required");
       return;
     }
 
-    if (!NOTE_TAGS.includes(tag as NoteTag)) {
+    if (!NOTE_TAGS.includes(normalizedTag)) {
       console.error("Invalid tag value for production API.");
       return;
     }
 
-    if (title.trim().length < 3 || content.trim().length < 5) {
+    if (normalizedTitle.length < 3 || normalizedContent.length < 5) {
       console.error("Title or content too short");
       return;
     }
 
-    mutation.mutate({ title, content, tag });
+    mutation.mutate({
+      title: normalizedTitle,
+      content: normalizedContent,
+      tag: normalizedTag,
+    });
   };
 
   return (
@@ -65,7 +76,7 @@ export default function NoteForm() {
         type="text"
         placeholder="Title"
         value={title}
-        onChange={(e) => setField("title", e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
         required
       />
 
@@ -73,13 +84,13 @@ export default function NoteForm() {
         placeholder="Content"
         rows={6}
         value={content}
-        onChange={(e) => setField("content", e.target.value)}
+        onChange={(e) => setContent(e.target.value)}
         required
       />
 
       <select
         value={tag}
-        onChange={(e) => setField("tag", e.target.value)}
+        onChange={(e) => setTag(e.target.value as NoteTag)}
         required
       >
         <option value="">Select tag</option>
