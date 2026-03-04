@@ -46,7 +46,21 @@ export default function NoteForm() {
       return;
     }
 
-    if (!NOTE_TAGS.includes(tag as NoteTag)) {
+    const productionTagsMap: Record<string, NoteTag> = {
+      work: "Work",
+      personal: "Personal",
+      meeting: "Meeting",
+      shopping: "Shopping",
+      ideas: "Ideas",
+      travel: "Travel",
+      finance: "Finance",
+      health: "Health",
+      important: "Important",
+      todo: "Todo",
+    };
+
+    const formattedTag = productionTagsMap[tag.toLowerCase()];
+    if (!formattedTag) {
       console.error("Invalid tag value for production API.");
       return;
     }
@@ -56,7 +70,7 @@ export default function NoteForm() {
       return;
     }
 
-    mutation.mutate({ title, content, tag });
+    mutation.mutate({ title, content, tag: formattedTag });
   };
 
   return (
