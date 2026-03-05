@@ -30,7 +30,7 @@
 .button:hover {
     background-color: #818b9a;
 }
-.modalOverlay {
+.modalBackdrop {
     position: fixed;
     top: 0;
     left: 0;
