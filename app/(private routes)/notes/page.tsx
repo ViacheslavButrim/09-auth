@@ -129,13 +129,13 @@ export default function NotesPage() {
                 <option value="Work">Work</option>
                 <option value="Personal">Personal</option>
                 <option value="Important">Important</option>
-                <option value="Meeting">Important</option>
-                <option value="Shopping">Important</option>
-                <option value="Ideas">Important</option>
-                <option value="Travel">Important</option>
-                <option value="Finance">Important</option>
-                <option value="Health">Important</option>
-                <option value="Todo">Important</option>
+                <option value="Meeting">Meeting</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Ideas">Ideas</option>
+                <option value="Travel">Travel</option>
+                <option value="Finance">Finance</option>
+                <option value="Health">Health</option>
+                <option value="Todo">Todo</option>
               </select>
               <div className={css.modalButtons}>
                 <button
