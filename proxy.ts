@@ -23,7 +23,7 @@ export async function proxy(request: NextRequest) {
 
   if (accessToken) {
     if (isPublicRoute) {
-      return NextResponse.redirect(new URL('/profile', request.url));
+      return NextResponse.redirect(new URL('/', request.url));
     }
     return NextResponse.next();
   }

@@ -2,8 +2,9 @@ import css from "./ProfilePage.module.css";
 import { getMe } from "@/lib/api/serverApi";
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next"; 
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Profile",
   description: "User profile page",
 };
@@ -15,7 +16,7 @@ export default async function ProfilePage() {
     user = await getMe();
   } catch (err) {
     console.error("Failed to fetch user:", err);
-    user = null; 
+    user = null;
   }
 
   if (!user) {

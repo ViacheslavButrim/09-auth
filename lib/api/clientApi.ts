@@ -59,7 +59,6 @@ export const getMe = async (): Promise<User> => {
 
 export const updateMe = async (body: {
   username: string;
-  photoUrl?: string;
 }): Promise<User> => {
   const { data } = await api.patch<User>("/users/me", body);
   return data;
@@ -91,8 +90,10 @@ export const fetchNoteById = async (id: string): Promise<Note> => {
   return data;
 };
 
-export const createNote = async (body: { title: string; content: string; tag: string }) => {
-  const { data } = await api.post("/notes", body, {
+export const createNote = async (
+  body: { title: string; content: string; tag: string }
+): Promise<Note> => {
+  const { data } = await api.post<Note>("/notes", body, {
     headers: { "Content-Type": "application/json" },
   });
   return data;
@@ -105,7 +106,7 @@ export const deleteNote = async (id: string): Promise<Note> => {
 
 export const checkSession = async (): Promise<User | null> => {
   try {
-    const { data } = await api.get<User>("/users/me");
+    const { data } = await api.get<User>("/auth/session");
     return data;
   } catch {
     return null;
