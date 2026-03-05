@@ -126,9 +126,16 @@ export default function NotesPage() {
                 required
               >
                 <option value="">Select tag</option>
-                <option value="work">Work</option>
-                <option value="personal">Personal</option>
-                <option value="important">Important</option>
+                <option value="Work">Work</option>
+                <option value="Personal">Personal</option>
+                <option value="Important">Important</option>
+                <option value="Meeting">Important</option>
+                <option value="Shopping">Important</option>
+                <option value="Ideas">Important</option>
+                <option value="Travel">Important</option>
+                <option value="Finance">Important</option>
+                <option value="Health">Important</option>
+                <option value="Todo">Important</option>
               </select>
               <div className={css.modalButtons}>
                 <button
