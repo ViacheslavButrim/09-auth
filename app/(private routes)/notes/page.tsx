@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchNotes, createNote } from "@/lib/api/clientApi";
 import NoteList from "@/components/NoteList/NoteList";
 import PaginationWithRouter from "@/components/Pagination/PaginationWithRouter";
+import Sidebar from "@/components/Sidebar/Sidebar";
 import { Note } from "@/types/note";
 import css from "./NotesPage.module.css";
 
@@ -22,6 +23,7 @@ export default function NotesPage() {
 
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
+  const tag = searchParams.get("tag") || "";
   const [searchInput, setSearchInput] = useState(search);
 
   const [showModal, setShowModal] = useState(false);
@@ -33,17 +35,16 @@ export default function NotesPage() {
   });
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["notes", page, search],
-    queryFn: () => fetchNotes({ page, search }),
+    queryKey: ["notes", page, search, tag],
+    queryFn: () => fetchNotes({ page, search, tag }),
   });
-
 
   const addNoteMutation = useMutation<Note, Error, NewNote>({
     mutationFn: (note) => createNote(note),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes", page, search] });
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
       setNewNote({ title: "", content: "", tag: "" });
-      setShowModal(false); 
+      setShowModal(false);
     },
     onError: (err) => {
       console.log("CREATE NOTE ERROR:", err);
@@ -71,96 +72,100 @@ export default function NotesPage() {
   if (!data) return null;
 
   return (
-    <div className={css.container}>
-      <div className={css.toolbar}>
-        <h1>Notes</h1>
-
-        <form onSubmit={handleSearch} className={css.searchForm}>
-          <input
-            type="text"
-            placeholder="Search notes..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className={css.searchInput}
-          />
-          <button type="submit" className={css.button}>
-            Search
-          </button>
-        </form>
-
-        <button className={css.button} onClick={() => setShowModal(true)}>
-          Add Note
-        </button>
-      </div>
-
-      {showModal && (
-        <div className={css.modalBackdrop}>
-          <div className={css.modal}>
-            <h2>Add New Note</h2>
-            <form onSubmit={handleAddNote} className={css.newNoteForm}>
+    <div className={css.pageWrapper}>
+      <Sidebar />
+      <div className={css.contentWrapper}>
+        <div className={css.toolbar}>
+          <h1>Notes</h1>
+          <div className={css.actions}>
+            <form onSubmit={handleSearch} className={css.searchForm}>
               <input
                 type="text"
-                placeholder="Title"
-                value={newNote.title}
-                onChange={(e) =>
-                  setNewNote((prev) => ({ ...prev, title: e.target.value }))
-                }
-                className={css.input}
+                placeholder="Search notes..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className={css.searchInput}
               />
-              <textarea
-                placeholder="Content"
-                rows={5}
-                value={newNote.content}
-                onChange={(e) =>
-                  setNewNote((prev) => ({ ...prev, content: e.target.value }))
-                }
-                className={css.input}
-                required
-              />
-              <select
-                value={newNote.tag}
-                onChange={(e) =>
-                  setNewNote((prev) => ({ ...prev, tag: e.target.value }))
-                }
-                className={css.input}
-                required
-              >
-                <option value="">Select tag</option>
-                <option value="Work">Work</option>
-                <option value="Personal">Personal</option>
-                <option value="Important">Important</option>
-                <option value="Meeting">Meeting</option>
-                <option value="Shopping">Shopping</option>
-                <option value="Ideas">Ideas</option>
-                <option value="Travel">Travel</option>
-                <option value="Finance">Finance</option>
-                <option value="Health">Health</option>
-                <option value="Todo">Todo</option>
-              </select>
-              <div className={css.modalButtons}>
-                <button
-                  type="submit"
-                  className={css.button}
-                  disabled={addNoteMutation.isPending}
-                >
-                  {addNoteMutation.isPending ? "Adding..." : "Add Note"}
-                </button>
-                <button
-                  type="button"
-                  className={css.button}
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-              </div>
+              <button type="submit" className={css.button}>
+                Search
+              </button>
             </form>
+
+            <button className={css.button} onClick={() => setShowModal(true)}>
+              Add Note
+            </button>
           </div>
         </div>
-      )}
 
-      <NoteList notes={data.notes} />
+        {showModal && (
+          <div className={css.modalBackdrop}>
+            <div className={css.modal}>
+              <h2>Add New Note</h2>
+              <form onSubmit={handleAddNote} className={css.newNoteForm}>
+                <input
+                  type="text"
+                  placeholder="Title"
+                  value={newNote.title}
+                  onChange={(e) =>
+                    setNewNote((prev) => ({ ...prev, title: e.target.value }))
+                  }
+                  className={css.input}
+                />
+                <textarea
+                  placeholder="Content"
+                  rows={5}
+                  value={newNote.content}
+                  onChange={(e) =>
+                    setNewNote((prev) => ({ ...prev, content: e.target.value }))
+                  }
+                  className={css.input}
+                  required
+                />
+                <select
+                  value={newNote.tag}
+                  onChange={(e) =>
+                    setNewNote((prev) => ({ ...prev, tag: e.target.value }))
+                  }
+                  className={css.input}
+                  required
+                >
+                  <option value="">Select tag</option>
+                  <option value="Work">Work</option>
+                  <option value="Personal">Personal</option>
+                  <option value="Important">Important</option>
+                  <option value="Meeting">Meeting</option>
+                  <option value="Shopping">Shopping</option>
+                  <option value="Ideas">Ideas</option>
+                  <option value="Travel">Travel</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Health">Health</option>
+                  <option value="Todo">Todo</option>
+                </select>
+                <div className={css.modalButtons}>
+                  <button
+                    type="submit"
+                    className={css.button}
+                    disabled={addNoteMutation.isPending}
+                  >
+                    {addNoteMutation.isPending ? "Adding..." : "Add Note"}
+                  </button>
+                  <button
+                    type="button"
+                    className={css.button}
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
-      <PaginationWithRouter currentPage={page} totalPages={data.totalPages} />
+        <NoteList notes={data.notes} />
+
+        <PaginationWithRouter currentPage={page} totalPages={data.totalPages} />
+      </div>
     </div>
   );
 }
