@@ -1,5 +1,5 @@
 .sidebar {
-    width: 220px;
+    min-width: 320px;
     padding: 20px;
     border-right: 1px solid #e5e7eb;
 }
@@ -13,6 +13,9 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
 }
 
 .tag {
